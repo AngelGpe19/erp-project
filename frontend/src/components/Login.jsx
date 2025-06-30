@@ -17,7 +17,7 @@ const Login = () => {
     e.preventDefault();
     try {
       await login(form);
-      navigate('/dashboard');
+      navigate('/home');
     } catch (err) {
       setError(err.message || 'Credenciales inválidas');
     }
