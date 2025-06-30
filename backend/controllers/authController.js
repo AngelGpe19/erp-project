@@ -32,8 +32,32 @@ const login = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  return res.status(501).json({ message: 'Funcionalidad de registro aún no implementada' });
+  const { nombre, correo, password } = req.body;
+
+  if (!nombre || !correo || !password) {
+    return res.status(400).json({ message: 'Todos los campos son requeridos' });
+  }
+
+  try {
+    const existingUser = await db.query('SELECT * FROM usuarios WHERE correo = $1', [correo]);
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({ message: 'El correo ya está registrado' });
+    }
+
+    const password_hash = await bcrypt.hash(password, 10);
+
+    const result = await db.query(
+      'INSERT INTO usuarios (nombre, correo, password_hash, id_rol, activo, fecha_creacion) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id_usuario',
+      [nombre, correo, password_hash, 2, true] // puedes ajustar el id_rol si lo deseas
+    );
+
+    res.status(201).json({ message: 'Usuario creado exitosamente', id_usuario: result.rows[0].id_usuario });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al registrar el usuario' });
+  }
 };
+
 
 
 module.exports = { login, register };

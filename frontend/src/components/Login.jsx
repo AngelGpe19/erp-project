@@ -5,7 +5,7 @@ import { login } from '../services/authService';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ correo: '', contraseña: '' });
+  const [form, setForm] = useState({ correo: '', password: '' });
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
@@ -38,9 +38,9 @@ const Login = () => {
         />
         <input
           type="password"
-          name="contraseña"
+          name="password"
           placeholder="Contraseña"
-          value={form.contraseña}
+          value={form.password}
           onChange={handleChange}
           required
           style={styles.input}
