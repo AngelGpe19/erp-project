@@ -5,6 +5,8 @@ import Login from './components/Login';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import Cotizaciones from './pages/Cotizaciones';
+
 
 function AppRoutes() {
   return (
@@ -17,6 +19,15 @@ function AppRoutes() {
   element={
     <ProtectedRoute>
       <Home />
+    </ProtectedRoute>
+  }
+/>
+
+        <Route
+  path="/cotizaciones"
+  element={
+    <ProtectedRoute>
+      <Cotizaciones />
     </ProtectedRoute>
   }
 />
