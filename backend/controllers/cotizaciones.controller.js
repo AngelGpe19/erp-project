@@ -1,3 +1,4 @@
+// backend/controllers/cotizaciones.controller.js
 const { pool } = require('../db/index');
 
 exports.obtenerCotizaciones = async (req, res) => {

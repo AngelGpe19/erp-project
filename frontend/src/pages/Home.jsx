@@ -13,6 +13,7 @@ const Home = () => {
         <li><Link to="/base-datos">💾 Base de Datos de Elementos</Link></li>
         <li><Link to="/agregar-elemento">🧴 Agregar Nuevo Producto</Link></li>
         <li><Link to="/usuarios">👤 Gestión de Usuarios</Link></li>
+        <li><Link to="/proveedores">👤 Proveedores</Link></li>
       </ul>
     </div>
   );
