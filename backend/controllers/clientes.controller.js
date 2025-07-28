@@ -2,15 +2,56 @@
 const { pool } = require('../db/index');
 
 // Obtener todos los clientes
+// controllers/clientes.controller.js
+// Obtener todos los clientes con paginación y búsqueda
 exports.obtenerClientes = async (req, res) => {
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = parseInt(req.query.offset) || 0;
+  const busqueda = req.query.busqueda || '';
+
   try {
-    const result = await pool.query('SELECT * FROM clientes ORDER BY id_cliente DESC');
-    res.status(200).json(result.rows);
+    let consulta;
+    let valores;
+    let totalConsulta;
+    let totalValores;
+
+    if (busqueda) {
+      // Si hay texto de búsqueda, filtrar por nombre, correo, empresa o RFC
+      consulta = `
+        SELECT * FROM clientes
+        WHERE nombre ILIKE $1 OR correo ILIKE $1 OR empresa ILIKE $1 OR rfc ILIKE $1
+        ORDER BY id_cliente DESC
+        LIMIT $2 OFFSET $3
+      `;
+      valores = [`%${busqueda}%`, limit, offset];
+
+      totalConsulta = `
+        SELECT COUNT(*) FROM clientes
+        WHERE nombre ILIKE $1 OR correo ILIKE $1 OR empresa ILIKE $1 OR rfc ILIKE $1
+      `;
+      totalValores = [`%${busqueda}%`];
+    } else {
+      // Sin filtro de búsqueda
+      consulta = `SELECT * FROM clientes ORDER BY id_cliente DESC LIMIT $1 OFFSET $2`;
+      valores = [limit, offset];
+
+      totalConsulta = `SELECT COUNT(*) FROM clientes`;
+      totalValores = [];
+    }
+
+    const result = await pool.query(consulta, valores);
+    const total = await pool.query(totalConsulta, totalValores);
+
+    res.status(200).json({
+      clientes: result.rows,
+      total: parseInt(total.rows[0].count)
+    });
   } catch (err) {
     console.error('Error al obtener clientes:', err);
     res.status(500).json({ error: 'Error al obtener clientes' });
   }
 };
+
 
 // Crear nuevo cliente
 exports.crearCliente = async (req, res) => {

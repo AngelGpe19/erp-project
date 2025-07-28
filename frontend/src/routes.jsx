@@ -7,6 +7,8 @@ import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Cotizaciones from './pages/Cotizaciones';
 import ProveedoresPage from './pages/ProveedoresPage';
+import ProductosPage from './pages/ProductosPage';
+import ClientesPage from './pages/ClientesPage';
 
 function AppRoutes() {
   return (
@@ -31,6 +33,16 @@ function AppRoutes() {
     </ProtectedRoute>
   }
 />
+
+          <Route
+  path="/productos"
+  element={
+    <ProtectedRoute>
+      <ProductosPage />
+    </ProtectedRoute>
+  }
+/>
+
            <Route
   path="/proveedores"
   element={
@@ -48,7 +60,24 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+         <Route
+  path="/clientes"
+  element={
+    <ProtectedRoute>
+      <ClientesPage/>
+    </ProtectedRoute>
+  }
+/>
+
+
+
+
+
+
       </Routes>
+
+
     </Router>
   );
 }
