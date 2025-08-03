@@ -9,6 +9,7 @@ import Cotizaciones from './pages/Cotizaciones';
 import ProveedoresPage from './pages/ProveedoresPage';
 import ProductosPage from './pages/ProductosPage';
 import ClientesPage from './pages/ClientesPage';
+import PreciosPage from './pages/PreciosPage';
 
 function AppRoutes() {
   return (
@@ -66,6 +67,15 @@ function AppRoutes() {
   element={
     <ProtectedRoute>
       <ClientesPage/>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/precios"
+  element={
+    <ProtectedRoute>
+      <PreciosPage/>
     </ProtectedRoute>
   }
 />

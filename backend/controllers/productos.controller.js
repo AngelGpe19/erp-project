@@ -1,3 +1,4 @@
+// backend/controllers/productos.controller.js
 const { pool } = require('../db/index');
 
 exports.obtenerProductos = async (req, res) => {

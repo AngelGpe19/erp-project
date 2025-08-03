@@ -15,6 +15,7 @@ const Home = () => {
         <li><Link to="/usuarios">🛠️ Gestión de Usuarios</Link></li>
         <li><Link to="/proveedores">👤 Proveedores</Link></li>
         <li><Link to="/clientes">💬 Clientes</Link></li>
+        <li><Link to="/precios">💲 Precios</Link></li>
       </ul>
     </div>
   );
