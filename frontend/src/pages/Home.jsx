@@ -11,8 +11,11 @@ const Home = () => {
         <li><Link to="/cotizaciones">📄 Ver Cotizaciones</Link></li>
         <li><Link to="/nueva-cotizacion">➕ Nueva Cotización</Link></li>
         <li><Link to="/base-datos">💾 Base de Datos de Elementos</Link></li>
-        <li><Link to="/agregar-elemento">🧴 Agregar Nuevo Producto</Link></li>
-        <li><Link to="/usuarios">👤 Gestión de Usuarios</Link></li>
+        <li><Link to="/productos">🧴 Agregar Nuevo Producto</Link></li>
+        <li><Link to="/usuarios">🛠️ Gestión de Usuarios</Link></li>
+        <li><Link to="/proveedores">👤 Proveedores</Link></li>
+        <li><Link to="/clientes">💬 Clientes</Link></li>
+        <li><Link to="/precios">💲 Precios</Link></li>
       </ul>
     </div>
   );

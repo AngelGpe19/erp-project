@@ -1,13 +1,79 @@
-body {
+/* Reset general */
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Tipografía global */
+body {
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  background-color: #f0f4f9;
+  color: #2b2d42;
+  line-height: 1.5;
+}
+
+/* Titulares */
+h1, h2, h3, h4 {
+  color: #2b5dab;
+}
+
+/* Inputs y botones */
+input, select, textarea {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #2b5dab;
+  outline: none;
+}
+
+/* Botón base */
+button {
+  padding: 0.5rem 1rem;
+  background-color: #2b5dab;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #1f4a8a;
+}
+
+/* Tablas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th, td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+}
+
+th {
+  background-color: #e3ecf7;
+  color: #1d3557;
+}
+
+/* Utilidades opcionales */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.section {
+  margin-bottom: 2rem;
 }

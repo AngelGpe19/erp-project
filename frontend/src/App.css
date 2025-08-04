@@ -1,38 +1,113 @@
-.App {
-  text-align: center;
+/* Layout general */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8fbff;
+  color: #333;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.contenedor-principal {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: auto;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Título de páginas */
+.titulo-pagina {
+  font-size: 2rem;
+  color: #2b5c99;
+  margin-bottom: 1rem;
+  text-align: left;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.paginacion {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  margin-top: 20px;
+  gap: 15px;
 }
 
-.App-link {
-  color: #61dafb;
+.pagina-actual {
+  font-weight: bold;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+
+/* Inputs y formulario */
+.input, .input-busqueda, .input-tabla {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin: 0.3rem;
+  font-size: 1rem;
+  width: 100%;
+  max-width: 300px;
+}
+
+.input-tabla {
+  padding: 0.3rem;
+}
+
+/* Botones */
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  margin: 0.2rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-azul { background-color: #2b5c99; color: white; }
+.btn-verde { background-color: #4caf50; color: white; }
+.btn-rojo { background-color: #f44336; color: white; }
+.btn-naranja { background-color: #ff9800; color: white; }
+.btn-gris { background-color: #9e9e9e; color: white; }
+
+.btn:hover {
+  filter: brightness(0.9);
+}
+
+/* Tablas */
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tabla th, .tabla td {
+  padding: 0.8rem;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.tabla th {
+  background-color: #e3ecf8;
+  color: #2b5c99;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contenedor-principal {
+    padding: 1rem;
   }
-  to {
-    transform: rotate(360deg);
+
+  .tabla, .tabla th, .tabla td {
+    font-size: 0.9rem;
+  }
+
+  .input, .input-busqueda {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
   }
 }
