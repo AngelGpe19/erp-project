@@ -7,6 +7,7 @@ const PreciosPage = () => {
   const [precios, setPrecios] = useState([]);
   const [total, setTotal] = useState(0);
   const [pagina, setPagina] = useState(1);
+  const [precioEnEdicion, setPrecioEnEdicion] = useState(null); //  Para modo edición
   const [limite] = useState(10);
 
   const fetchPrecios = async () => {
@@ -34,11 +35,47 @@ const PreciosPage = () => {
 
   const totalPaginas = Math.ceil(total / limite);
 
+  const handleEliminar = async (id) => {
+  const confirmar = window.confirm('¿Estás seguro de que deseas eliminar este precio?');
+  if (!confirmar) return;
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_URL}/precios/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) throw new Error('Error al eliminar');
+
+    fetchPrecios();
+  } catch (err) {
+    console.error('Error al eliminar:', err.message);
+  }
+};
+
+const handleEditar = (precio) => {
+  setPrecioEnEdicion(precio);
+};
+
+const handleCancelEdit = () => {
+  setPrecioEnEdicion(null);
+};
+
+
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold text-gray-800">Gestión de Precios</h1>
 
-      <CrearPrecioForm onSuccess={handleNuevoPrecio} />
+      <CrearPrecioForm
+  onSuccess={() => {
+    handleNuevoPrecio();
+    setPrecioEnEdicion(null);
+  }}
+  enEdicion={precioEnEdicion}
+  onCancelEdit={handleCancelEdit}
+/>
+
 
       <table className="w-full border mt-4 text-sm">
         <thead className="bg-gray-200">
@@ -51,22 +88,38 @@ const PreciosPage = () => {
             <th>Marca</th>
             <th>Enlace</th>
             <th>Condiciones</th>
+            <th>Acciones</th>
           </tr>
         </thead>
-        <tbody>
-          {precios.map(p => (
-            <tr key={p.id_precio} className="border-t">
-              <td>{p.id_precio}</td>
-              <td>{p.nombre_producto}</td>
-              <td>{p.nombre_proveedor}</td>
-              <td>${parseFloat(p.precio_unitario).toFixed(2)}</td>
-              <td>{p.cantidad}</td>
-              <td>{p.marca}</td>
-              <td><a href={p.enlace} target="_blank" rel="noreferrer" className="text-blue-600 underline">Ver</a></td>
-              <td>{p.condiciones_pago}</td>
-            </tr>
-          ))}
-        </tbody>
+       <tbody>
+  {precios.map(p => (
+    <tr key={p.id_precio} className="border-t">
+      <td>{p.id_precio}</td>
+      <td>{p.nombre_producto}</td>
+      <td>{p.nombre_proveedor}</td>
+      <td>${parseFloat(p.precio_unitario).toFixed(2)}</td>
+      <td>{p.cantidad}</td>
+      <td>{p.marca}</td>
+      <td><a href={p.enlace} target="_blank" rel="noreferrer" className="text-blue-600 underline">Ver</a></td>
+      <td>{p.condiciones_pago}</td>
+      <td className="space-x-2">
+        <button
+          onClick={() => handleEditar(p)}
+          className="text-blue-600 hover:underline"
+        >
+          Editar
+        </button>
+        <button
+          onClick={() => handleEliminar(p.id_precio)}
+          className="text-red-600 hover:underline"
+        >
+          Eliminar
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
       </table>
 
       <div className="flex justify-between items-center mt-4">
