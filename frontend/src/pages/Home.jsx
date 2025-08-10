@@ -9,7 +9,7 @@ const Home = () => {
       <p>Selecciona una opción:</p>
       <ul style={styles.menu}>
         <li><Link to="/cotizaciones">📄 Ver Cotizaciones</Link></li>
-        <li><Link to="/nueva-cotizacion">➕ Nueva Cotización</Link></li>
+        <li><Link to="/crear-cotizacion">➕ Nueva Cotización</Link></li>
         <li><Link to="/base-datos">💾 Base de Datos de Elementos</Link></li>
         <li><Link to="/productos">🧴 Agregar Nuevo Producto</Link></li>
         <li><Link to="/usuarios">🛠️ Gestión de Usuarios</Link></li>

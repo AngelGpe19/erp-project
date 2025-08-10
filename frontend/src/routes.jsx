@@ -10,6 +10,7 @@ import ProveedoresPage from './pages/ProveedoresPage';
 import ProductosPage from './pages/ProductosPage';
 import ClientesPage from './pages/ClientesPage';
 import PreciosPage from './pages/PreciosPage';
+import CotizacionCrearEditarPage from './pages/CotizacionCrearEditarPage';
 
 function AppRoutes() {
   return (
@@ -31,6 +32,15 @@ function AppRoutes() {
   element={
     <ProtectedRoute>
       <Cotizaciones />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/crear-cotizacion"
+  element={
+    <ProtectedRoute>
+      <CotizacionCrearEditarPage/>
     </ProtectedRoute>
   }
 />

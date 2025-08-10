@@ -6,7 +6,8 @@ const {
   obtenerProductos,
   crearProducto,
   eliminarProducto,
-  editarProducto
+  editarProducto,
+  buscarProductos
 } = require('../controllers/productos.controller'); 
 
 
@@ -14,5 +15,5 @@ router.get('/', verificarToken, obtenerProductos);
 router.post('/', verificarToken, crearProducto);
 router.delete('/:id', verificarToken, eliminarProducto);
 router.put('/:id', verificarToken, editarProducto);
-
+router.get('/buscar', verificarToken, buscarProductos);
 module.exports = router;
