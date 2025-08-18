@@ -14,7 +14,7 @@ const TotalesResumen = () => {
         ? 1 + item.ganancia.valor / 100
         : 1 + item.ganancia.valor);
 
-    return acc + precioConGanancia * item.cantidadContenido;
+    return acc + precioConGanancia * item.cantidadPiezas;
   }, 0);
 
   const impuesto = totalSinImpuesto * impuestoPorcentaje;

@@ -16,7 +16,7 @@ const BuscarProductoForm = () => {
 
     try {
       const res = await fetch(
-        `${API_URL}/productos/buscar?q=${encodeURIComponent(termino)}`,
+        `${API_URL}/productos/buscar-con-precio?q=${encodeURIComponent(termino)}`,
         {
           method: "GET",
           headers: {

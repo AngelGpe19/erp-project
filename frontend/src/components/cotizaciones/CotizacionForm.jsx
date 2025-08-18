@@ -1,11 +1,16 @@
 // src/components/cotizaciones/CotizacionForm.jsx
 import React, { useContext } from "react";
-import BuscarProductoForm from "./BuscarProductoForm"; // corregido nombre según tu importación
+import BuscarProductoForm from "./BuscarProductoForm"; 
 import TablaDetalleCotizacion from "./TablaDetalleCotizacion";
-import TotalesResumen from "./TotalesResumen"; // asumimos que ya está creado y exportado
+import TotalesResumen from "./TotalesResumen"; 
+import BotonGuardar  from "./BotonGuardar"; 
 import { CotizacionContext } from "../../context/CotizacionContext";
 
+
+
 const CotizacionForm = () => {
+
+  
   const {
     productosCotizacion,
     actualizarCantidadContenido,
@@ -27,6 +32,10 @@ const CotizacionForm = () => {
       />
 
       <TotalesResumen productosCotizacion={productosCotizacion} />
+
+      <BotonGuardar />
+
+
     </div>
   );
 };

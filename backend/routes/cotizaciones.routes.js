@@ -11,7 +11,8 @@ const { verificarToken } = require('../middleware/auth.middleware');
 // Importa las funciones necesarias desde el controlador
 const {
   obtenerCotizaciones,
-  crearCotizacion
+  crearCotizacion,
+  crearCotizacionConDetalles
 } = require('../controllers/cotizaciones.controller');
 
 // Ruta de prueba sin autenticación
@@ -36,5 +37,6 @@ router.get('/test', async (req, res) => {
 router.get('/cotizaciones', verificarToken, obtenerCotizaciones);
 // router.get('/', cotizacionesController.obtenerCotizaciones);
 router.post('/', verificarToken, crearCotizacion); // Protegida también
+router.post('/con-detalles', verificarToken, crearCotizacionConDetalles);
 
 module.exports = router;

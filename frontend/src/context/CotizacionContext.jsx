@@ -4,18 +4,21 @@ import React, { createContext, useContext, useState } from "react";
 export const CotizacionContext = createContext();
 
 export const CotizacionProvider = ({ children }) => {
-  // Estado con productos, cada uno con producto, precio, cantidadContenido y ganancia
   const [productosCotizacion, setProductosCotizacion] = useState([]);
 
-  // Agrega producto completo con cantidadContenido inicial 1 y ganancia 0%
-  const agregarProducto = ({ producto, precio, cantidadContenido = 1, ganancia = { tipo: "porcentaje", valor: 0 } }) => {
+  // Nuevo: agregar producto con cantidadContenido fijo y cantidadPiezas inicial 1
+  const agregarProducto = ({ producto, precio, cantidadContenido = 1, cantidadPiezas = 1, ganancia = { tipo: "porcentaje", valor: 0 } }) => {
+
+if (!producto || !precio) {
+    console.error("🚨 Error: se intentó agregar producto sin datos válidos", { producto, precio });
+    return;
+  }
     setProductosCotizacion((prev) => [
       ...prev,
-      { producto, precio, cantidadContenido, ganancia },
+      { producto, precio, cantidadContenido, cantidadPiezas, ganancia },
     ]);
   };
 
-  // Actualiza cantidad de contenido (volumen) para el producto en el índice
   const actualizarCantidadContenido = (index, cantidadContenido) => {
     setProductosCotizacion((prev) =>
       prev.map((item, i) =>
@@ -26,23 +29,29 @@ export const CotizacionProvider = ({ children }) => {
     );
   };
 
-  // Actualiza ganancia para el producto en el índice (objeto {tipo, valor})
-  const actualizarGanancia = (index, ganancia) => {
+  // Esta es la cantidad que realmente cambia para el cálculo
+  const actualizarCantidadPiezas = (index, cantidadPiezas) => {
     setProductosCotizacion((prev) =>
       prev.map((item, i) =>
         i === index
-          ? { ...item, ganancia }
+          ? { ...item, cantidadPiezas: parseInt(cantidadPiezas) || 1 }
           : item
       )
     );
   };
 
-  // Elimina producto por índice
+  const actualizarGanancia = (index, ganancia) => {
+    setProductosCotizacion((prev) =>
+      prev.map((item, i) =>
+        i === index ? { ...item, ganancia } : item
+      )
+    );
+  };
+
   const eliminarProducto = (index) => {
     setProductosCotizacion((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Limpia la cotización
   const limpiarCotizacion = () => setProductosCotizacion([]);
 
   return (
@@ -51,6 +60,7 @@ export const CotizacionProvider = ({ children }) => {
         productosCotizacion,
         agregarProducto,
         actualizarCantidadContenido,
+        actualizarCantidadPiezas,
         actualizarGanancia,
         eliminarProducto,
         limpiarCotizacion,
@@ -60,5 +70,6 @@ export const CotizacionProvider = ({ children }) => {
     </CotizacionContext.Provider>
   );
 };
+
 
 export const useCotizacion = () => useContext(CotizacionContext);

@@ -5,13 +5,21 @@ import GananciaSelector from "./GananciaSelector";
 const TablaDetalleCotizacion = ({
   productosCotizacion,
   actualizarCantidadContenido,
+  actualizarCantidadPiezas,
   actualizarGanancia,
   eliminarProducto,
 }) => {
-  const handleCantidadChange = (index, value) => {
+  const handleCantidadContenidoChange = (index, value) => {
     const val = parseFloat(value);
     if (!isNaN(val) && val > 0) {
       actualizarCantidadContenido(index, val);
+    }
+  };
+
+  const handleCantidadPiezasChange = (index, value) => {
+    const val = parseInt(value);
+    if (!isNaN(val) && val > 0) {
+      actualizarCantidadPiezas(index, val);
     }
   };
 
@@ -28,6 +36,7 @@ const TablaDetalleCotizacion = ({
             <th>Producto</th>
             <th>Unidad</th>
             <th>Cantidad Contenido</th>
+            <th>Cantidad Piezas</th>
             <th>Precio Unitario</th>
             <th>Ganancia</th>
             <th>Subtotal</th>
@@ -37,7 +46,7 @@ const TablaDetalleCotizacion = ({
         <tbody>
           {productosCotizacion.length === 0 && (
             <tr>
-              <td colSpan="7" className="text-center py-4">
+              <td colSpan="8" className="text-center py-4">
                 No hay productos agregados.
               </td>
             </tr>
@@ -50,19 +59,32 @@ const TablaDetalleCotizacion = ({
                 ? 1 + item.ganancia.valor / 100
                 : 1 + item.ganancia.valor);
 
-            const subtotal = precioConGanancia * item.cantidadContenido;
+            const subtotal = precioConGanancia * item.cantidadPiezas;
 
             return (
               <tr key={`${item.producto.id_producto}-${item.precio.id_precio}`}>
                 <td>{item.producto.nombre}</td>
                 <td>{item.producto.unidad_medida}</td>
                 <td>
+                  {/* Cantidad Contenido: volumen fijo, editable solo si quieres */}
                   <input
                     type="number"
                     min="1"
                     value={item.cantidadContenido}
                     onChange={(e) =>
-                      handleCantidadChange(index, e.target.value)
+                      handleCantidadContenidoChange(index, e.target.value)
+                    }
+                    className="border px-2 py-1 rounded w-20"
+                  />
+                </td>
+                <td>
+                  {/* Cantidad Piezas: la cantidad que se multiplica para subtotal */}
+                  <input
+                    type="number"
+                    min="1"
+                    value={item.cantidadPiezas}
+                    onChange={(e) =>
+                      handleCantidadPiezasChange(index, e.target.value)
                     }
                     className="border px-2 py-1 rounded w-20"
                   />
@@ -91,5 +113,6 @@ const TablaDetalleCotizacion = ({
     </div>
   );
 };
+
 
 export default TablaDetalleCotizacion;
