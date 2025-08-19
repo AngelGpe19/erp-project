@@ -53,13 +53,13 @@ const TablaDetalleCotizacion = ({
           )}
 
           {productosCotizacion.map((item, index) => {
-            const precioConGanancia =
-              item.precio.precio_unitario *
-              (item.ganancia.tipo === "porcentaje"
-                ? 1 + item.ganancia.valor / 100
-                : 1 + item.ganancia.valor);
+          const precioConGanancia =
+  item.ganancia.tipo === "porcentaje"
+    ? parseFloat(item.precio.precio_unitario) * (1 + parseFloat(item.ganancia.valor) / 100)
+    : parseFloat(item.precio.precio_unitario) + parseFloat(item.ganancia.valor);
 
-            const subtotal = precioConGanancia * item.cantidadPiezas;
+const subtotal = precioConGanancia * parseInt(item.cantidadPiezas || 0, 10);
+
 
             return (
               <tr key={`${item.producto.id_producto}-${item.precio.id_precio}`}>

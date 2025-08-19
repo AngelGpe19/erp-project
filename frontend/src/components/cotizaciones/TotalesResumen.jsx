@@ -8,14 +8,14 @@ const TotalesResumen = () => {
   const impuestoPorcentaje = 0.16;
 
   const totalSinImpuesto = productosCotizacion.reduce((acc, item) => {
-    const precioConGanancia =
-      item.precio.precio_unitario *
-      (item.ganancia.tipo === "porcentaje"
-        ? 1 + item.ganancia.valor / 100
-        : 1 + item.ganancia.valor);
+  const precioConGanancia =
+    item.ganancia.tipo === "porcentaje"
+      ? parseFloat(item.precio.precio_unitario) * (1 + parseFloat(item.ganancia.valor) / 100)
+      : parseFloat(item.precio.precio_unitario) + parseFloat(item.ganancia.valor);
 
-    return acc + precioConGanancia * item.cantidadPiezas;
-  }, 0);
+  return acc + precioConGanancia * parseInt(item.cantidadPiezas || 0, 10);
+}, 0);
+
 
   const impuesto = totalSinImpuesto * impuestoPorcentaje;
   const totalConImpuesto = totalSinImpuesto + impuesto;

@@ -14,6 +14,7 @@ const CotizacionForm = () => {
   const {
     productosCotizacion,
     actualizarCantidadContenido,
+   actualizarCantidadPiezas,
     actualizarGanancia,
     eliminarProducto,
   } = useContext(CotizacionContext);
@@ -27,6 +28,7 @@ const CotizacionForm = () => {
       <TablaDetalleCotizacion
         productosCotizacion={productosCotizacion}
         actualizarCantidadContenido={actualizarCantidadContenido}
+         actualizarCantidadPiezas={actualizarCantidadPiezas}
         actualizarGanancia={actualizarGanancia}
         eliminarProducto={eliminarProducto}
       />

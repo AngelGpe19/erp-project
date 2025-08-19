@@ -19,14 +19,14 @@ export default function BotonGuardar() {
       (item) => item.producto && item.precio
     );
 
-    const total_estimado = productosValidos.reduce((acc, item) => {
-      const precioConGanancia =
-        Number(item.precio.precio_unitario) *
-        (item.ganancia.tipo === "porcentaje"
-          ? 1 + Number(item.ganancia.valor) / 100
-          : 1 + Number(item.ganancia.valor));
-      return acc + precioConGanancia * Number(item.cantidadPiezas);
-    }, 0);
+   const total_estimado = productosValidos.reduce((acc, item) => {
+  const precioConGanancia =
+    item.ganancia.tipo === "porcentaje"
+      ? parseFloat(item.precio.precio_unitario) * (1 + parseFloat(item.ganancia.valor) / 100)
+      : parseFloat(item.precio.precio_unitario) + parseFloat(item.ganancia.valor);
+
+  return acc + precioConGanancia * parseInt(item.cantidadPiezas || 0, 10);
+}, 0);
 
     const margen_utilidad =
       productosValidos.length === 0
@@ -38,26 +38,25 @@ export default function BotonGuardar() {
           ) / productosValidos.length;
 
     // Preparar payload
-    const body = {
-      id_cliente: Number(idCliente),
-      margen_utilidad,
-      total_estimado,
-      productos: productosValidos.map((item, index) => ({
-        id_producto: Number(item.producto.id_producto),
-        id_precio: Number(item.precio.id_precio),
-        cantidad: Number(item.cantidadPiezas),
-        ganancia_tipo: item.ganancia.tipo,
-        ganancia_valor: Number(item.ganancia.valor),
-        precio_unitario_estimado: Number(item.precio.precio_unitario),
-        precio_unitario_con_ganancia:
-          Number(item.precio.precio_unitario) *
-          (item.ganancia.tipo === "porcentaje"
-            ? 1 + Number(item.ganancia.valor) / 100
-            : 1 + Number(item.ganancia.valor)),
-      })),
-    };
+  const body = {
+  id_cliente: Number(idCliente),
+  margen_utilidad,
+  total_estimado,
+  productos: productosValidos.map((item) => ({
+    id_producto: Number(item.producto.id_producto),
+    id_precio: Number(item.precio.id_precio),
+    cantidad: Number(item.cantidadPiezas),
+    ganancia_tipo: item.ganancia.tipo,
+    ganancia_valor: Number(item.ganancia.valor),
+    precio_unitario_estimado: Number(item.precio.precio_unitario),
+    precio_unitario_con_ganancia:
+      item.ganancia.tipo === "porcentaje"
+        ? parseFloat(item.precio.precio_unitario) * (1 + parseFloat(item.ganancia.valor) / 100)
+        : parseFloat(item.precio.precio_unitario) + parseFloat(item.ganancia.valor),
+  })),
+};
 
-    console.log("📦 Payload final a enviar:", body);
+    console.log(" Payload final a enviar:", body);
 
     try {
       const token = localStorage.getItem("token");
