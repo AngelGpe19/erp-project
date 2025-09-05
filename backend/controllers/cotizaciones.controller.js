@@ -217,3 +217,50 @@ exports.obtenerCotizacionPorId = async (req, res) => {
     res.status(500).json({ error: "Error del servidor" });
   }
 };
+
+
+
+exports.actualizarEstadoCotizacion = async (req, res) => {
+  const { id_cotizacion } = req.params;
+  const { nuevoEstado, id_usuario } = req.body;
+
+  try {
+    // Obtener cotización actual
+    const cotizacion = await pool.query(
+      "SELECT estado FROM cotizaciones WHERE id_cotizacion = $1",
+      [id_cotizacion]
+    );
+
+    if (cotizacion.rows.length === 0) {
+      return res.status(404).json({ error: "Cotización no encontrada" });
+    }
+
+    const estadoActual = cotizacion.rows[0].estado;
+
+    // Validar transición
+    if (estadoActual === "pendiente" && nuevoEstado !== "Revisado") {
+      return res.status(400).json({ error: "Solo puede pasar a 'Revisado' desde pendiente." });
+    }
+
+    if (estadoActual === "Revisado" && !["Aprobado", "Rechazada"].includes(nuevoEstado)) {
+      return res.status(400).json({ error: "Solo puede pasar a 'Aprobado' o 'Rechazada' desde Revisado." });
+    }
+
+    // Actualizar estado cotización
+    await pool.query(
+      "UPDATE cotizaciones SET estado = $1, autorizado_por = $2 WHERE id_cotizacion = $3",
+      [nuevoEstado, id_usuario, id_cotizacion]
+    );
+
+    // Registrar en historial
+    await pool.query(
+      "INSERT INTO historial_aprobaciones (id_cotizacion, id_usuario, estado) VALUES ($1, $2, $3)",
+      [id_cotizacion, id_usuario, nuevoEstado]
+    );
+
+    res.json({ message: "Estado actualizado correctamente", nuevoEstado });
+  } catch (error) {
+    console.error("Error al actualizar estado:", error.message);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};

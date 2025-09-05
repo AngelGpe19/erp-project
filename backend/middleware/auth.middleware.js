@@ -1,7 +1,9 @@
+// backend/middleware/auth.middleware.js
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-const secretKey = process.env.JWT_SECRET || 'secreto_predeterminado';
-
+const secretKey = process.env.JWT_SECRET ;
+//const secretKey = process.env.JWT_SECRET;
 const verificarToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
 

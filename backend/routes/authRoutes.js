@@ -1,20 +1,13 @@
+// backend/routes/authRoutes.js
 const express = require('express');
 const router = express.Router();
-const { login, register } = require('../controllers/authController');
+const { login, register,getUsuario } = require('../controllers/authController');
+const { verificarToken } = require('../middleware/auth.middleware');
 const { pool } = require('../db');
-
+// Rutas de autenticación
 router.post('/login', login);
 router.post('/register', register); // Opcional, para pruebas
-
-// Ruta GET para testear conexión
-router.get('/test-usuarios', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM usuarios LIMIT 5');
-    res.status(200).json(result.rows);
-  } catch (err) {
-    console.error('❌ Error al consultar usuarios:', err);
-    res.status(500).json({ error: 'Error al obtener usuarios' });
-  }
-});
+//  para traer info del usuario autenticado
+router.get('/me',verificarToken,getUsuario);
 
 module.exports = router;
