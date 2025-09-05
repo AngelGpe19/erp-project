@@ -11,7 +11,6 @@ import ProductosPage from './pages/ProductosPage';
 import ClientesPage from './pages/ClientesPage';
 import PreciosPage from './pages/PreciosPage';
 import CotizacionCrearEditarPage from './pages/CotizacionCrearEditarPage';
-
 function AppRoutes() {
   return (
     <Router>
@@ -36,14 +35,10 @@ function AppRoutes() {
   }
 />
 
-<Route
-  path="/crear-cotizacion"
-  element={
-    <ProtectedRoute>
-      <CotizacionCrearEditarPage/>
-    </ProtectedRoute>
-  }
-/>
+<Route path="/cotizaciones/editar/:id" element={<CotizacionCrearEditarPage modo="editar" />} />
+
+  <Route path="/crear-cotizacion" element={<CotizacionCrearEditarPage modo="crear" />} />
+
 
           <Route
   path="/productos"

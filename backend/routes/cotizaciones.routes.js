@@ -12,7 +12,10 @@ const { verificarToken } = require('../middleware/auth.middleware');
 const {
   obtenerCotizaciones,
   crearCotizacion,
-  crearCotizacionConDetalles
+  crearCotizacionConDetalles,
+  eliminarCotizacion,
+  actualizarCotizacion,
+  obtenerCotizacionPorId
 } = require('../controllers/cotizaciones.controller');
 
 // Ruta de prueba sin autenticación
@@ -38,5 +41,9 @@ router.get('/cotizaciones', verificarToken, obtenerCotizaciones);
 // router.get('/', cotizacionesController.obtenerCotizaciones);
 router.post('/', verificarToken, crearCotizacion); // Protegida también
 router.post('/con-detalles', verificarToken, crearCotizacionConDetalles);
+router.delete('/:id', verificarToken, eliminarCotizacion);
+router.put('/:id', verificarToken, actualizarCotizacion);
+
+router.get('/:id', verificarToken, obtenerCotizacionPorId);
 
 module.exports = router;

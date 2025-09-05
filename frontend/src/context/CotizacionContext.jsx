@@ -54,6 +54,17 @@ if (!producto || !precio) {
 
   const limpiarCotizacion = () => setProductosCotizacion([]);
 
+  const cargarCotizacionExistente = (productos) => {
+  setProductosCotizacion(productos.map(p => ({
+    producto: { id_producto: p.id_producto, nombre: p.nombre, unidad_medida: p.unidad_medida },
+    precio: { id_precio: p.id_precio, precio_unitario: p.precio_unitario_estimado },
+    cantidadContenido: 1,
+    cantidadPiezas: p.cantidad,
+    ganancia: { tipo: p.ganancia_tipo, valor: p.ganancia_valor }
+  })));
+};
+
+
   return (
     <CotizacionContext.Provider
       value={{
@@ -64,6 +75,7 @@ if (!producto || !precio) {
         actualizarGanancia,
         eliminarProducto,
         limpiarCotizacion,
+      cargarCotizacionExistente,
       }}
     >
       {children}

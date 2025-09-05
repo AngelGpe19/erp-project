@@ -122,3 +122,98 @@ exports.crearCotizacion = async (req, res) => {
     res.status(500).json({ error: 'Error al registrar cotización' });
   }
 };
+
+// Otros controladores (obtenerCotizacionPorId, actualizarCotizacion, eliminarCotizacion) permanecen igual
+
+
+exports.eliminarCotizacion = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query("DELETE FROM detalle_cotizacion WHERE id_cotizacion = $1", [id]);
+    await pool.query("DELETE FROM cotizaciones WHERE id_cotizacion = $1", [id]);
+    res.status(200).json({ message: "Cotización eliminada correctamente" });
+  } catch (err) {
+    console.error("Error al eliminar cotización:", err);
+    res.status(500).json({ error: "Error al eliminar cotización" });
+  }
+};
+
+exports.actualizarCotizacion = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { id } = req.params;
+    const { id_cliente, margen_utilidad, total_estimado, productos } = req.body;
+
+    await client.query("BEGIN");
+
+    // Actualizar cabecera
+    await client.query(
+      `UPDATE cotizaciones
+       SET id_cliente = $1, margen_utilidad = $2, total_estimado = $3
+       WHERE id_cotizacion = $4`,
+      [id_cliente, margen_utilidad, total_estimado, id]
+    );
+
+    // Eliminar detalles viejos
+    await client.query("DELETE FROM detalle_cotizacion WHERE id_cotizacion = $1", [id]);
+
+    // Insertar detalles nuevos
+    const insertDetalle = `
+      INSERT INTO detalle_cotizacion
+      (id_cotizacion, id_producto, id_precio, cantidad, precio_unitario_estimado, ganancia_tipo, ganancia_valor, precio_unitario_con_ganancia)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+    `;
+    for (const p of productos) {
+      await client.query(insertDetalle, [
+        id, p.id_producto, p.id_precio, p.cantidad,
+        p.precio_unitario_estimado, p.ganancia_tipo, p.ganancia_valor,
+        p.precio_unitario_con_ganancia
+      ]);
+    }
+
+    await client.query("COMMIT");
+    res.status(200).json({ message: "Cotización actualizada correctamente" });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Error al actualizar cotización:", err);
+    res.status(500).json({ error: "Error al actualizar cotización" });
+  } finally {
+    client.release();
+  }
+};
+
+exports.obtenerCotizacionPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const cotizacion = await pool.query(
+      `SELECT * FROM cotizaciones WHERE id_cotizacion = $1`,
+      [id]
+    );
+
+    const productos = await pool.query(
+      `SELECT 
+        dc.id_producto,
+        dc.id_precio,
+        dc.cantidad,
+        dc.precio_unitario_estimado,
+        dc.ganancia_tipo,
+        dc.ganancia_valor,
+        dc.precio_unitario_con_ganancia,
+        p.nombre,
+        p.unidad_medida
+       FROM detalle_cotizacion dc
+       JOIN productos p ON dc.id_producto = p.id_producto
+       WHERE dc.id_cotizacion = $1`,
+      [id]
+    );
+
+    res.json({
+      ...cotizacion.rows[0],
+      productos: productos.rows,
+    });
+  } catch (err) {
+    console.error("Error al obtener cotización por ID:", err);
+    res.status(500).json({ error: "Error del servidor" });
+  }
+};
