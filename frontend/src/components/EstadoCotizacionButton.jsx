@@ -18,7 +18,7 @@ const EstadoCotizacionButton = ({ idCotizacion, estadoActual, fetchCotizaciones 
         `${process.env.REACT_APP_API_URL}/cotizaciones/${idCotizacion}/estado`,
         {
           nuevoEstado,
-          id_usuario: usuario.id_usuario, // 🔥 ahora usamos el ID real
+          id_usuario: usuario.id_usuario,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -33,9 +33,11 @@ const EstadoCotizacionButton = ({ idCotizacion, estadoActual, fetchCotizaciones 
     }
   };
 
+  // ➡️ Validar el flujo según el rol del usuario y el estado de la cotización
   return (
     <div style={{ display: "flex", gap: "0.5rem" }}>
-      {estadoActual === "pendiente" && (
+      {/* Botón de "Revisar" solo visible para el rol "Ventas" y si la cotización está "pendiente" */}
+      {usuario && usuario.rol === "Ventas" && estadoActual === "pendiente" && (
         <button
           className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
           onClick={() => cambiarEstado("Revisado")}
@@ -44,7 +46,8 @@ const EstadoCotizacionButton = ({ idCotizacion, estadoActual, fetchCotizaciones 
         </button>
       )}
 
-      {estadoActual === "Revisado" && (
+      {/* Botones de "Aprobar" y "Rechazar" solo visibles para el rol "Administrador" y si la cotización está "Revisado" */}
+      {usuario && usuario.rol === "Administrador" && estadoActual === "Revisado" && (
         <>
           <button
             className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"

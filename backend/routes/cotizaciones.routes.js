@@ -29,6 +29,6 @@ router.delete('/:id', verificarToken, eliminarCotizacion);
 router.put('/:id', verificarToken, actualizarCotizacion);
 
 router.get('/:id', verificarToken, obtenerCotizacionPorId);
-router.patch("/:id/estado", cotizacionesController.actualizarEstadoCotizacion);
+router.patch("/:id_cotizacion/estado", cotizacionesController.actualizarEstadoCotizacion);
 
 module.exports = router;
