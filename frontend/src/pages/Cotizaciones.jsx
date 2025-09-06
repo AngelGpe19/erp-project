@@ -108,7 +108,7 @@ const Cotizaciones = () => {
               <td>{cot.margen_utilidad}%</td>
               <td>
                 <span style={getStatusStyle(cot.estatus)}>
-                  {cot.estatus || "Pendiente"}
+                  {cot.estatus || "pendiente"}
                 </span>
               </td>
               <td>
@@ -155,11 +155,7 @@ const styles = {
     width: "100%",
     borderCollapse: "collapse",
   },
-  status: {
-    padding: "0.2rem 0.6rem",
-    borderRadius: "5px",
-    fontWeight: "bold",
-  },
+
 };
 
 const getStatusStyle = (estatus) => {
@@ -171,9 +167,9 @@ const getStatusStyle = (estatus) => {
   };
 
   switch ((estatus || "").toLowerCase()) {
-    case "aprobada":
+    case "aprobado":
       return { ...base, backgroundColor: "green" };
-    case "rechazada":
+    case "rechazado":
       return { ...base, backgroundColor: "red" };
     case "pendiente":
     default:
