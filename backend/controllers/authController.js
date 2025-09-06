@@ -1,34 +1,33 @@
+// backend/controllers/authController.js 
 const db = require('../db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
+//require('dotenv').config();
 
 const login = async (req, res) => {
-  // Cambié username por correo
-  const { correo, password } = req.body;
-  if (!correo || !password)
-    return res.status(400).json({ message: 'Correo y contraseña son requeridos' });
+  const { correo, password } = req.body;
+  if (!correo || !password)
+    return res.status(400).json({ message: 'Correo y contraseña son requeridos' });
 
-  try {
-    // Cambié la consulta para buscar por correo en lugar de username
-    const result = await db.query('SELECT * FROM usuarios WHERE correo = $1', [correo]);
-    if (result.rows.length === 0)
-      return res.status(401).json({ message: 'Credenciales incorrectas' });
+  try {
+    const result = await db.query('SELECT * FROM usuarios WHERE correo = $1', [correo]);
+    if (result.rows.length === 0)
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
 
-    const user = result.rows[0];
-    const validPassword = await bcrypt.compare(password, user.password_hash);
-    if (!validPassword)
-      return res.status(401).json({ message: 'Credenciales incorrectas' });
+    const user = result.rows[0];
+    const validPassword = await bcrypt.compare(password, user.password_hash);
+    if (!validPassword)
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
 
-    // Crear payload para token, manteniendo username por si lo usas en el frontend o puedes cambiar a correo
-    const payload = { id: user.id, correo: user.correo, role: user.role };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+    // CAMBIO CRÍTICO: Usar 'id_usuario' en el payload
+    const payload = { id_usuario: user.id_usuario, correo: user.correo, role: user.id_rol };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
 
-    res.json({ token, user: { id: user.id, correo: user.correo, role: user.role } });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error interno del servidor' });
-  }
+    res.json({ token, user: { id_usuario: user.id_usuario, correo: user.correo, role: user.role } });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
 };
 
 const register = async (req, res) => {
@@ -58,6 +57,28 @@ const register = async (req, res) => {
   }
 };
 
+const getUsuario = async (req, res) => {
+  try {
+   if (!req.usuario || !req.usuario.id_usuario) { 
+      return res.status(401).json({ message: 'Usuario no autenticado' });
+    }
+    const { id_usuario } = req.usuario;
+    
+    // Se realiza un JOIN para obtener el nombre del rol desde la tabla 'roles'
+    const usuario = await db.query(
+      "SELECT u.id_usuario, u.nombre, r.nombre_rol AS rol FROM usuarios u JOIN roles r ON u.id_rol = r.id_rol WHERE u.id_usuario = $1",
+      [id_usuario]
+    );
+    
+    if (usuario.rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
 
+    res.json(usuario.rows[0]);
+  } catch (error) {
+    console.error("Error obteniendo usuario:", error);
+    res.status(500).json({ error: "Error interno" });
+  }
+};
 
-module.exports = { login, register };
+module.exports = { login, register, getUsuario };

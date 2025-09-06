@@ -10,6 +10,24 @@ exports.obtenerProductos = async (req, res) => {
     res.status(500).json({ error: 'Error del servidor al obtener productos' });
   }
 };
+exports.buscarProductos = async (req, res) => {
+  const { q } = req.query; // texto a buscar
+  try {
+    const result = await pool.query(
+      `SELECT p.id_producto, p.nombre, p.unidad_medida, p.descripcion, p.categoria,
+              pp.precio_unitario, pp.cantidad, pp.marca, pp.enlace
+       FROM productos p
+       LEFT JOIN precios_producto pp ON p.id_producto = pp.id_producto
+       WHERE p.nombre ILIKE $1 OR p.descripcion ILIKE $1
+       ORDER BY p.nombre`,
+      [`%${q}%`]
+    );
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error al buscar productos:', error.message);
+    res.status(500).json({ error: 'Error del servidor al buscar productos' });
+  }
+};
 
 exports.crearProducto = async (req, res) => {
   const { nombre, unidad_medida, descripcion, categoria } = req.body;
@@ -52,5 +70,24 @@ exports.editarProducto = async (req, res) => {
   } catch (error) {
     console.error('Error al editar producto:', error.message);
     res.status(500).json({ error: 'Error al editar producto' });
+  }
+};
+
+exports.buscarProductosConPrecio = async (req, res) => {
+  const { q } = req.query;
+  try {
+    const result = await pool.query(
+      `SELECT p.id_producto, p.nombre, p.unidad_medida, p.descripcion, p.categoria,
+              pp.id_precio, pp.precio_unitario, pp.cantidad, pp.marca, pp.enlace
+       FROM productos p
+       LEFT JOIN precios_producto pp ON p.id_producto = pp.id_producto
+       WHERE p.nombre ILIKE $1 OR p.descripcion ILIKE $1
+       ORDER BY p.nombre`,
+      [`%${q}%`]
+    );
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error al buscar productos con precio:', error.message);
+    res.status(500).json({ error: 'Error al buscar productos con precio' });
   }
 };
