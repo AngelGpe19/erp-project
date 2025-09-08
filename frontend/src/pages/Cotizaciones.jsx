@@ -163,7 +163,7 @@ const getStatusStyle = (estatus) => {
   switch ((estatus || "").toLowerCase()) {
     case "aprobado":
       return { ...base, backgroundColor: "green" };
-    case "rechazado":
+    case "rechazada":
       return { ...base, backgroundColor: "red" };
     case "pendiente":
     default:

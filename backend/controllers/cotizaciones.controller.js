@@ -14,6 +14,7 @@ exports.obtenerCotizaciones = async (req, res) => {
   FROM cotizaciones c
   JOIN clientes cl ON c.id_cliente = cl.id_cliente
   ORDER BY c.fecha_creacion DESC
+  LIMIT 40
 `);
     res.status(200).json(result.rows);
   } catch (err) {

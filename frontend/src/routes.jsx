@@ -11,6 +11,7 @@ import ProductosPage from './pages/ProductosPage';
 import ClientesPage from './pages/ClientesPage';
 import PreciosPage from './pages/PreciosPage';
 import CotizacionCrearEditarPage from './pages/CotizacionCrearEditarPage';
+import ManageUsers from './pages/ManageUsers';
 function AppRoutes() {
   return (
     <Router>
@@ -48,6 +49,17 @@ function AppRoutes() {
     </ProtectedRoute>
   }
 />
+
+
+          <Route
+  path="/usuarios"
+  element={
+    <ProtectedRoute>
+      <ManageUsers />
+    </ProtectedRoute>
+  }
+/>
+
 
            <Route
   path="/proveedores"
