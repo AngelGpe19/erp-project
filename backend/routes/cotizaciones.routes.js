@@ -16,7 +16,8 @@ const {
   eliminarCotizacion,
   actualizarCotizacion,
   obtenerCotizacionPorId,
-  actualizarEstadoCotizacion
+  actualizarEstadoCotizacion,
+  obtenerLaCotizacionExcel
 } = require('../controllers/cotizaciones.controller');
 
 
@@ -30,5 +31,5 @@ router.put('/:id', verificarToken, actualizarCotizacion);
 
 router.get('/:id', verificarToken, obtenerCotizacionPorId);
 router.patch("/:id_cotizacion/estado", cotizacionesController.actualizarEstadoCotizacion);
-
+router.get('/:id/excel', verificarToken, obtenerLaCotizacionExcel);
 module.exports = router;

@@ -264,3 +264,54 @@ exports.actualizarEstadoCotizacion = async (req, res) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };
+
+
+// Otra funcion para obtener el excel
+exports.obtenerLaCotizacionExcel = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Obtener datos de la cotización
+        const cotizacionResult = await pool.query(
+            `SELECT c.*, cl.nombre AS nombre_cliente
+             FROM cotizaciones c
+             JOIN clientes cl ON c.id_cliente = cl.id_cliente
+             WHERE c.id_cotizacion = $1`,
+            [id]
+        );
+
+        if (cotizacionResult.rows.length === 0) {
+            return res.status(404).json({ error: "Cotización no encontrada." });
+        }
+        const cotizacionData = cotizacionResult.rows[0];
+
+        // Obtener datos de los productos del detalle de la cotización
+        const productosResult = await pool.query(
+            `SELECT
+                dc.*, p.nombre AS nombre_producto, p.unidad_medida, p.descripcion
+             FROM detalle_cotizacion dc
+             JOIN productos p ON dc.id_producto = p.id_producto
+             WHERE dc.id_cotizacion = $1`,
+            [id]
+        );
+        const productosData = productosResult.rows;
+
+        // Obtener los datos del cliente
+        const clienteResult = await pool.query(
+            `SELECT nombre FROM clientes WHERE id_cliente = $1`,
+            [cotizacionData.id_cliente]
+        );
+        const clienteData = clienteResult.rows[0];
+
+        // Combinar todos los datos y enviarlos como respuesta
+        res.status(200).json({
+            cotizacion: cotizacionData,
+            productos: productosData,
+            cliente: clienteData
+        });
+
+    } catch (err) {
+        console.error("Error al obtener la cotización para Excel:", err);
+        res.status(500).json({ error: "Error del servidor al obtener datos de la cotización." });
+    }
+};
