@@ -1,6 +1,7 @@
 // src/pages/Cotizaciones.jsx
 import React, { useEffect, useState } from "react";
 import EstadoCotizacionButton from "../components/EstadoCotizacionButton";
+import DownloadExcelButton from "../components/DownloadExcelButton";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -133,14 +134,7 @@ const Cotizaciones = () => {
   />
 
   {/*  Botón de descarga */}
-  <button
-    onClick={() => alert("Aquí llamas a tu función de descarga")}
-    className="bg-indigo-500 text-white px-2 py-1 rounded hover:bg-indigo-600 ml-2"
-  >
-    Descargar
-  </button>
-
-
+<DownloadExcelButton cotizacionId={cot.id} />
               </td>
             </tr>
           ))}
@@ -169,7 +163,7 @@ const getStatusStyle = (estatus) => {
   switch ((estatus || "").toLowerCase()) {
     case "aprobado":
       return { ...base, backgroundColor: "green" };
-    case "rechazado":
+    case "rechazada":
       return { ...base, backgroundColor: "red" };
     case "pendiente":
     default:

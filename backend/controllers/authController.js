@@ -31,10 +31,17 @@ const login = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  const { nombre, correo, password } = req.body;
+  // Ahora el body de la solicitud debe incluir 'nombre', 'correo', 'password' y 'id_rol'
+  const { nombre, correo, password, id_rol } = req.body;
 
-  if (!nombre || !correo || !password) {
-    return res.status(400).json({ message: 'Todos los campos son requeridos' });
+  // Validación de campos requeridos
+  if (!nombre || !correo || !password || !id_rol) {
+    return res.status(400).json({ message: 'Todos los campos (nombre, correo, password, id_rol) son requeridos' });
+  }
+  
+  // Validación del id_rol para asegurar que sea 1 o 2
+  if (id_rol !== 1 && id_rol !== 2) {
+      return res.status(400).json({ message: 'El id_rol debe ser 1 (Administrador) o 2 (Ventas)' });
   }
 
   try {
@@ -43,11 +50,13 @@ const register = async (req, res) => {
       return res.status(409).json({ message: 'El correo ya está registrado' });
     }
 
+    // El servidor hashea la contraseña
     const password_hash = await bcrypt.hash(password, 10);
 
     const result = await db.query(
+      // La consulta ahora usa el id_rol proporcionado
       'INSERT INTO usuarios (nombre, correo, password_hash, id_rol, activo, fecha_creacion) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id_usuario',
-      [nombre, correo, password_hash, 2, true] // puedes ajustar el id_rol si lo deseas
+      [nombre, correo, password_hash, id_rol, true]
     );
 
     res.status(201).json({ message: 'Usuario creado exitosamente', id_usuario: result.rows[0].id_usuario });
@@ -56,6 +65,7 @@ const register = async (req, res) => {
     res.status(500).json({ message: 'Error al registrar el usuario' });
   }
 };
+
 
 const getUsuario = async (req, res) => {
   try {
@@ -81,4 +91,63 @@ const getUsuario = async (req, res) => {
   }
 };
 
-module.exports = { login, register, getUsuario };
+const getUsers = async (req, res) => {
+  const { query, limit = 30 } = req.query;
+
+  try {
+    let users;
+    // Si se proporciona una consulta, busca por nombre, correo o id_usuario
+    if (query) {
+      // Intenta convertir la consulta a un número para buscar por id_usuario
+      const idQuery = parseInt(query, 10);
+      let sqlQuery;
+      let params;
+
+      if (!isNaN(idQuery)) {
+        // Si es un número, busca por id_usuario
+        sqlQuery = 'SELECT id_usuario, nombre, correo, id_rol, activo, fecha_creacion FROM usuarios WHERE id_usuario = $1 LIMIT $2';
+        params = [idQuery, limit];
+      } else {
+        // Si no es un número, busca por nombre o correo (insensible a mayúsculas)
+        sqlQuery = 'SELECT id_usuario, nombre, correo, id_rol, activo, fecha_creacion FROM usuarios WHERE LOWER(nombre) LIKE LOWER($1) OR LOWER(correo) LIKE LOWER($1) LIMIT $2';
+        params = [`%${query}%`, limit];
+      }
+      const result = await db.query(sqlQuery, params);
+      users = result.rows;
+    } else {
+      // Si no hay consulta, trae los últimos usuarios creados
+      const result = await db.query('SELECT id_usuario, nombre, correo, id_rol, activo, fecha_creacion FROM usuarios ORDER BY fecha_creacion DESC LIMIT $1', [limit]);
+      users = result.rows;
+    }
+    
+    // Si no se encuentran usuarios, devuelve un mensaje
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron usuarios.' });
+    }
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al obtener usuarios' });
+  }
+};
+
+// Función para eliminar un usuario por su ID
+const deleteUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await db.query('DELETE FROM usuarios WHERE id_usuario = $1 RETURNING *', [id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.status(200).json({ message: 'Usuario eliminado exitosamente' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al eliminar el usuario' });
+  }
+};
+
+module.exports = { login, register, getUsuario,getUsers, deleteUser };
