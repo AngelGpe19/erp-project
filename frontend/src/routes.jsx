@@ -3,7 +3,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/Login';
 import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Cotizaciones from './pages/Cotizaciones';
 import ProveedoresPage from './pages/ProveedoresPage';
@@ -12,6 +11,7 @@ import ClientesPage from './pages/ClientesPage';
 import PreciosPage from './pages/PreciosPage';
 import CotizacionCrearEditarPage from './pages/CotizacionCrearEditarPage';
 import ManageUsers from './pages/ManageUsers';
+import Reportes from './pages/Reportes';
 function AppRoutes() {
   return (
     <Router>
@@ -71,10 +71,10 @@ function AppRoutes() {
 />
 
         <Route
-          path="/dashboard"
+          path="/reportes"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <Reportes />
             </ProtectedRoute>
           }
         />
