@@ -1,32 +1,43 @@
-
 services:
+  # Servicio para la Base de Datos PostgreSQL
+  db:
+    image: postgres:16-alpine  # Usamos una imagen oficial y ligera de Postgres
+    restart: always
+    environment:
+      POSTGRES_USER: Angel
+      POSTGRES_PASSWORD: holamundo19
+      POSTGRES_DB: ERP_COAD
+    ports:
+      # Mapea el puerto 5432 del contenedor a tu máquina por si quieres conectar un cliente de DB
+      - "5432:5432"
+    volumes:
+      # IMPORTANTE: Esto crea una carpeta en tu proyecto para guardar los datos de la DB
+      # Así, aunque borres el contenedor, tus datos no se pierden.
+      - ./postgres-data:/var/lib/postgresql/data
+
   # Servicio para el Backend
   backend:
     build: ./backend
     restart: always
     ports:
-      # Mapea el puerto 4000 del contenedor al 4000 de tu máquina
       - "4000:4000"
     environment:
-      # Pasamos las variables de tu archivo .env
-      PORT: 4000
-      DATABASE_URL: ${DATABASE_URL} # Tomará el valor de un .env en la raíz
+      # ¡CAMBIO CLAVE! Ahora apunta al servicio 'db' en lugar de localhost o un .env
+      DATABASE_URL: postgresql://Angel:holamundo19@db:5432/ERP_COAD
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+    depends_on:
+      # Le dice a Docker que inicie y espere a que el servicio 'db' esté listo ANTES de iniciar el backend
+      - db
 
   # Servicio para el Frontend
   frontend:
     build:
       context: ./frontend
       args:
-        # ¡IMPORTANTE! Así le pasamos la URL de la API al build de React
-        # 'backend' es el nombre del servicio de arriba.
         REACT_APP_API_URL: http://backend:4000/api
     restart: always
     ports:
-      # Nginx corre en el puerto 80 dentro del contenedor.
-      # Lo mapeamos al puerto 3000 de tu máquina para que accedas desde el navegador.
       - "3000:80"
     depends_on:
-      # Le dice a Docker que inicie el backend ANTES que el frontend
       - backend
