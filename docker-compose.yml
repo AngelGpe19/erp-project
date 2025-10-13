@@ -1,0 +1,43 @@
+services:
+  # Servicio para la Base de Datos PostgreSQL
+  db:
+    image: postgres:17  # Usamos una imagen oficial y ligera de Postgres
+    restart: always
+    environment:
+      POSTGRES_USER: Angel
+      POSTGRES_PASSWORD: holamundo19
+      POSTGRES_DB: ERP_COAD
+    ports:
+      # Mapea el puerto 5432 del contenedor a tu máquina por si quieres conectar un cliente de DB
+      - "5432:5432"
+    volumes:
+      # IMPORTANTE: Esto crea una carpeta en tu proyecto para guardar los datos de la DB
+      # Así, aunque borres el contenedor, tus datos no se pierden.
+      - ./postgres-data:/var/lib/postgresql/data
+
+  # Servicio para el Backend
+  backend:
+    build: ./backend
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      # ¡CAMBIO CLAVE! Ahora apunta al servicio 'db' en lugar de localhost o un .env
+      DATABASE_URL: postgresql://Angel:holamundo19@db:5432/ERP_COAD
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+    depends_on:
+      # Le dice a Docker que inicie y espere a que el servicio 'db' esté listo ANTES de iniciar el backend
+      - db
+
+  # Servicio para el Frontend
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_API_URL: http://localhost:4000/api
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
