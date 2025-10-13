@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 4000
 
 # El comando para iniciar tu servidor (basado en tu package.json)
-CMD [ "node", "index.js" ]
+CMD [ "node", "app.js" ]
