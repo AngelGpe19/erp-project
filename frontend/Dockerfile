@@ -30,6 +30,8 @@ FROM nginx:1.25-alpine
 # al directorio por defecto de Nginx para servir contenido HTML
 COPY --from=builder /app/build /usr/share/nginx/html
 
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Le decimos a Nginx que escuche en el puerto 80
 EXPOSE 80
 
