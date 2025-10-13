@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Servicio para el Backend
+  backend:
+    build: ./backend
+    restart: always
+    ports:
+      # Mapea el puerto 4000 del contenedor al 4000 de tu máquina
+      - "4000:4000"
+    environment:
+      # Pasamos las variables de tu archivo .env
+      PORT: 4000
+      DATABASE_URL: ${DATABASE_URL} # Tomará el valor de un .env en la raíz
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+
+  # Servicio para el Frontend
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # ¡IMPORTANTE! Así le pasamos la URL de la API al build de React
+        # 'backend' es el nombre del servicio de arriba.
+        REACT_APP_API_URL: http://backend:4000/api
+    restart: always
+    ports:
+      # Nginx corre en el puerto 80 dentro del contenedor.
+      # Lo mapeamos al puerto 3000 de tu máquina para que accedas desde el navegador.
+      - "3000:80"
+    depends_on:
+      # Le dice a Docker que inicie el backend ANTES que el frontend
+      - backend
