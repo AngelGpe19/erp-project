@@ -1,2 +1,5 @@
 #variable de entorno
 .env
+
+#postree data
+postgres-data/
