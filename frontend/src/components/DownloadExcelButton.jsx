@@ -2,6 +2,22 @@ import React, { useState } from "react";
 import axios from "axios";
 import { generarExcelCotizacion } from "../utils/generarExcelCotizacion";
 
+import logo from '../utils/logo.PNG';
+
+const urlToBase64 = async (url) => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            // El Base64 viene con el prefijo "data:image/png;base64,...", ExcelJS solo necesita la parte después de la coma.
+            resolve(reader.result.split(',')[1]);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+};
+
 const DownloadExcelButton = ({ cotizacionId }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -15,6 +31,10 @@ const DownloadExcelButton = ({ cotizacionId }) => {
         throw new Error("Token de autenticación no encontrado.");
       }
 
+
+const logoBase64 = await urlToBase64(logo);
+
+
       const res = await axios.get(
         `${process.env.REACT_APP_API_URL}/cotizaciones/${cotizacionId}/excel`,
         {
@@ -24,8 +44,10 @@ const DownloadExcelButton = ({ cotizacionId }) => {
         }
       );
       
+      
+
       console.log("Datos del backend para Excel:", res.data);
-      await generarExcelCotizacion(res.data);
+      await generarExcelCotizacion(res.data, logoBase64);
     } catch (err) {
       console.error("Error al descargar el Excel:", err);
       setError("❌ Error al descargar el archivo. Intente de nuevo más tarde.");

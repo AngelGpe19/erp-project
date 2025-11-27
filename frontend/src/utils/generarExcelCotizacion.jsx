@@ -1,10 +1,10 @@
-//src/utils/generarExcelCotizacion.jsx 
+// src/utils/generarExcelCotizacion.jsx 
 // Importamos las librerías necesarias
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
 // Función para generar el archivo de Excel con los datos de una cotización
-export const generarExcelCotizacion = async (cotizacionData) => {
+export const generarExcelCotizacion = async (cotizacionData, logoBase64) => {
     try {
         // Creamos un nuevo libro de trabajo de Excel
         const workbook = new ExcelJS.Workbook();
@@ -16,6 +16,11 @@ export const generarExcelCotizacion = async (cotizacionData) => {
             showFormulas: false,
             showRowColHeaders: false
         }];
+
+         // --- AJUSTE DE ALTURA DE FILAS 
+        worksheet.getRow(1).height = 31.5;
+        worksheet.getRow(2).height = 31.5;
+        worksheet.getRow(3).height = 31.5;
 
         // Estilos personalizados
         const styles = {
@@ -63,7 +68,29 @@ export const generarExcelCotizacion = async (cotizacionData) => {
             },
             money: {
                 alignment: { vertical: 'middle', horizontal: 'center' },
-                numFmt: '_("$"* #,##0.00_);_("$"* (#,##0.00);_("$"* "-"??_);_(@_)',
+                // numFmt: '_("$"* #,##0.00_);_("$"* (#,##0.00);_("$"* "-"??_);_(@_)', // Se omite el formato de moneda en el código final para mantenerlo simple como pediste
+                border: {
+                    top: { style: 'thin' },
+                    left: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    right: { style: 'thin' }
+                }
+            },
+            totalLabel: { // Estilo para las etiquetas de los totales al final de la tabla
+                font: { bold: true, color: { argb: 'FF000000' } },
+                alignment: { horizontal: 'right', vertical: 'middle' },
+                fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEBF1DE' } },
+                border: {
+                    top: { style: 'thin' },
+                    left: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    right: { style: 'thin' }
+                }
+            },
+            yellowCell: { // Estilo para las celdas de observaciones
+                font: { bold: true, color: { argb: 'FF000000' } },
+                alignment: { vertical: 'middle', horizontal: 'left', wrapText: true },
+                fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } }, // Amarillo
                 border: {
                     top: { style: 'thin' },
                     left: { style: 'thin' },
@@ -85,36 +112,59 @@ export const generarExcelCotizacion = async (cotizacionData) => {
         ];
 
         // 3. Escribimos los datos estáticos y aplicamos estilos
-        // Aquí usamos la data de la cotización
         const { cotizacion, productos, cliente } = cotizacionData;
+        
+        // Celdas de Totales (reubicadas en Fila 1 y 2 en el original, ahora eliminadas de ahí)
+        const totalEstimado = cotizacion.total_estimado;
+        const totalConImpuestos = (totalEstimado * 1.16).toFixed(2); // Calculo de IVA
+        const impuestos = (totalConImpuestos - totalEstimado).toFixed(2);
 
-        // Fila 1 - Título "Cotización"
-        worksheet.mergeCells('B1:C2');
-        const titleCell = worksheet.getCell('B1');
+ // --- INSERCIÓN DE IMAGEN (A1:B3) ---
+        if (logoBase64) {
+            // Añadimos la imagen al libro
+            const imageId = workbook.addImage({
+                base64: logoBase64,
+                extension: 'png',
+            });
+
+            // Combinamos las celdas para el logo
+            worksheet.mergeCells('A1:B3');
+
+            // Colocamos la imagen sobre las celdas combinadas
+            // tl: Top-Left (Columna 0, Fila 0) -> A1
+            // br: Bottom-Right (Columna 2, Fila 3) -> Final de B3 (el inicio de C4)
+            worksheet.addImage(imageId, {
+                tl: { col: 0, row: 0 },
+                br: { col: 2, row: 3 }, 
+                editAs: 'oneCell' // Ayuda a que se mantenga dentro
+            });
+        }
+
+        // Fila 1 - Título "Cotización" (Cambiado de B1:C2 a C1:D2)
+        worksheet.mergeCells('C1:D2');
+        const titleCell = worksheet.getCell('C1');
         titleCell.value = 'Cotización';
         titleCell.font = { bold: true, size: 24 };
         titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
 
-        // Fila 1 y 2 - Totales
-        worksheet.getCell('D1').value = 'Antes de impuestos';
-        worksheet.getCell('D1').style = styles.output;
-        worksheet.getCell('E1').value = cotizacion.total_estimado;
-        worksheet.getCell('E1').style = { ...styles.output, numFmt: '$#,##0.00' };
-
-        worksheet.getCell('D2').value = 'Despues de impuestos';
-        worksheet.getCell('D2').style = styles.output;
-        worksheet.getCell('E2').value = (cotizacion.total_estimado * 1.16).toFixed(2); // Calculo de IVA
-        worksheet.getCell('E2').style = { ...styles.output, numFmt: '$#,##0.00' };
+        // Fila 1 a 3 - Datos del proveedor (E1:G3)
+        worksheet.mergeCells('E1:G3');
+        const supplierInfo = `JORGE GUERRERO HERNANDEZ\nRFC: GUHJ880818522\nCalle: Margaritas # 67, Col: Rancho Alegre 1 CP. 96558\nCoatzacoalcos, Veracruz; México\nTel 1640718 Cel. 9211021874, E-Mail: jorgeguerrerohernandez@gmail.com`;
+        const supplierCell = worksheet.getCell('E1');
+        supplierCell.value = supplierInfo;
+        supplierCell.font = { size: 10 };
+        supplierCell.alignment = { horizontal: 'right', vertical: 'top', wrapText: true };
 
         // Fila 4 - Cliente
         worksheet.getCell('D4').value = 'Cliente:';
         worksheet.getCell('D4').style = styles.header;
-        worksheet.mergeCells('E4:F4');
+        worksheet.mergeCells('E4:G4'); // Ampliado para cubrir más espacio
         const clientCell = worksheet.getCell('E4');
         clientCell.value = cliente.nombre;
         clientCell.style = styles.input;
         clientCell.alignment = { horizontal: 'left', vertical: 'middle' };
 
+        
         // Fila 5 - Encabezados de la tabla dinámica
         worksheet.getCell('A5').value = 'Numero';
         worksheet.getCell('A5').style = styles.header;
@@ -137,10 +187,10 @@ export const generarExcelCotizacion = async (cotizacionData) => {
             worksheet.getCell(`A${rowIndex}`).value = index + 1;
             worksheet.getCell(`A${rowIndex}`).style = styles.cellContent;
 
-            worksheet.getCell(`B${rowIndex}`).value = p.nombre_producto; // Asegúrate de que tu API devuelve este campo
+            worksheet.getCell(`B${rowIndex}`).value = p.nombre_producto; 
             worksheet.getCell(`B${rowIndex}`).style = styles.cellContent;
 
-            worksheet.getCell(`C${rowIndex}`).value = p.descripcion; // Asegúrate de que tu API devuelve este campo
+            worksheet.getCell(`C${rowIndex}`).value = p.descripcion; 
             worksheet.getCell(`C${rowIndex}`).style = styles.cellContent;
 
             worksheet.getCell(`D${rowIndex}`).value = p.unidad_medida;
@@ -150,13 +200,53 @@ export const generarExcelCotizacion = async (cotizacionData) => {
             worksheet.getCell(`E${rowIndex}`).style = styles.cellContent;
 
             worksheet.getCell(`F${rowIndex}`).value = p.precio_unitario_con_ganancia;
-            worksheet.getCell(`F${rowIndex}`).style = styles.money;
+            worksheet.getCell(`F${rowIndex}`).style = styles.cellContent; // Aplicamos cellContent en lugar de money
 
             worksheet.getCell(`G${rowIndex}`).value = p.subtotal_con_ganancia;
-            worksheet.getCell(`G${rowIndex}`).style = styles.money;
+            worksheet.getCell(`G${rowIndex}`).style = styles.cellContent; // Aplicamos cellContent en lugar de money
 
             rowIndex++;
         });
+
+        // 4.1. Agregamos los totales al final de la lista (columna G)
+        const totalRowIndex = rowIndex; // Fila inmediatamente después del último producto
+
+        // Antes de impuestos (Subtotal)
+        worksheet.getCell(`F${totalRowIndex}`).value = 'Antes de impuestos:';
+        worksheet.getCell(`F${totalRowIndex}`).style = styles.totalLabel;
+        worksheet.getCell(`G${totalRowIndex}`).value = totalEstimado;
+        worksheet.getCell(`G${totalRowIndex}`).style = styles.cellContent;
+
+        // Impuestos (IVA)
+        worksheet.getCell(`F${totalRowIndex + 1}`).value = 'Impuestos (16% IVA):';
+        worksheet.getCell(`F${totalRowIndex + 1}`).style = styles.totalLabel;
+        worksheet.getCell(`G${totalRowIndex + 1}`).value = impuestos;
+        worksheet.getCell(`G${totalRowIndex + 1}`).style = styles.cellContent;
+
+        // Después de impuestos (Total)
+        worksheet.getCell(`F${totalRowIndex + 2}`).value = 'Después de impuestos:';
+        worksheet.getCell(`F${totalRowIndex + 2}`).style = styles.totalLabel;
+        worksheet.getCell(`G${totalRowIndex + 2}`).value = totalConImpuestos;
+        worksheet.getCell(`G${totalRowIndex + 2}`).style = styles.cellContent;
+
+
+        // 4.2. Agregamos las observaciones (3 celdas abajo del final de la tabla de conceptos)
+        const obsRowIndex = totalRowIndex + 5; // Empezar 3 filas después de los totales (totalRowIndex + 2)
+
+        const observations = [
+            'OBSERVACIONES:',
+            'MATERIAL SUJETO A DISPONIBILIDAD SPV.',
+            'SE COTIZA GASTOS DE ENVIO',
+            'VIGENCIA DE LA COTIZACION: De 3 Días habiles.'
+        ];
+
+        // Usamos la columna B
+        observations.forEach((obs, index) => {
+            worksheet.getCell(`B${obsRowIndex + index}`).value = obs;
+            worksheet.getCell(`B${obsRowIndex + index}`).style = styles.yellowCell;
+            worksheet.getCell(`B${obsRowIndex + index}`).alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+        });
+
 
         // 5. Generamos el archivo y lo descargamos
         const buffer = await workbook.xlsx.writeBuffer();
